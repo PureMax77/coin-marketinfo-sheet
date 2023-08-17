@@ -1,6 +1,4 @@
-import { NextRequest } from "next/server";
-
-export async function http<T>(request: NextRequest): Promise<T> {
+export async function http<T>(request: RequestInfo): Promise<T> {
   const response = await fetch(request, {
     method: "GET",
     headers: {

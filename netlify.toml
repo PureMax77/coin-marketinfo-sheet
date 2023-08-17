@@ -1,5 +1,6 @@
 [[redirects]]
-  from = "/api/coinone/:path*"
-  to = "https://api.coinone.co.kr/public/v2/:path*"
-  status = 200
-  force = true 
+  from = "/api/coinone"
+  to = "https://api.coinone.co.kr/public/v2"
+  status = 301
+  force = false
+  query = {path = ":path"}

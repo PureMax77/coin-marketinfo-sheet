@@ -1,6 +1,6 @@
 [[redirects]]
-  from = "/api/coinone/:path*"
-  to = "https://api.coinone.co.kr/public/v2/:path*"
+  from = "/api/coinone/*"
+  to = "https://api.coinone.co.kr/public/v2/:splat"
   status = 200
   force = true
   queryString = "retain"

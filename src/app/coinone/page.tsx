@@ -83,7 +83,7 @@ export default function Home() {
 
     // CSV 헤더 생성
     const csvHeader =
-      "market,symbol,timestamp,year,month,day,open,high,low,close(종가),target_volume,quote_volume\n";
+      "market,symbol,year,month,day,open,high,low,close,target_volume,quote_volume\n";
 
     // CSV 데이터 생성
     const csvData = filteredData.map((data) => {
@@ -92,7 +92,7 @@ export default function Home() {
       const month = date.getMonth() + 1;
       const day = date.getDate();
 
-      return `${market},${symbol},${data.timestamp},${year},${month},${day},${data.open},${data.high},${data.low},${data.close},${data.target_volume},${data.quote_volume}`;
+      return `${market},${symbol},${year},${month},${day},${data.open},${data.high},${data.low},${data.close},${data.target_volume},${data.quote_volume}`;
     });
 
     // 최종 CSV 문자열 생성

@@ -37,16 +37,25 @@ export default function Home() {
   const CurrencyArray = Object.values(CurrencyTypes) as string[];
   const IntervalArray = Object.values(IntervalTypes) as string[];
 
+  const clearData = () => {
+    if (csvFile) {
+      setCsvFile(""); // csv파일 초기화
+      setChartData([]);
+    }
+  };
+
   // select onchange
   const handleYearChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputYear = parseInt(event.target.value);
     setSelectedYear(inputYear);
+    clearData();
   };
   const handleMonthChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputMonth = parseInt(event.target.value);
 
     if (inputMonth >= 1 && inputMonth <= 12) {
       setSelectedMonth(inputMonth);
+      clearData();
     } else {
       alert("1~12의 숫자만 입력 가능합니다.");
     }
@@ -56,14 +65,16 @@ export default function Home() {
       alert("코인원은 현재 KRW 마켓만 지원합니다.");
       return;
     }
-
     setCurrency(event.target.value as CurrencyTypes);
+    clearData();
   };
   const symbolChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setNowSymbol(event.target.value);
+    clearData();
   };
   const IntervalChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setInterval(event.target.value as IntervalTypes);
+    clearData();
   };
 
   const makeCSV = (

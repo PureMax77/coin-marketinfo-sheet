@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 const Header = () => {
@@ -11,6 +13,14 @@ const Header = () => {
           <Link href="/coinone" className="text-white hover:underline">
             Coinone
           </Link>
+          <button
+            className="text-white hover:underline"
+            onClick={() => {
+              alert("준비중입니다...");
+            }}
+          >
+            Upbit
+          </button>
           {/* <Link href="/upbit" className="text-white hover:underline">
             Upbit
           </Link> */}

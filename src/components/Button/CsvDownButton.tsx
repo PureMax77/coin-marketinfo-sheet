@@ -4,11 +4,13 @@ import React from "react";
 interface CsvDownButtonProps {
   csvContent: string;
   csvInfo: CsvInfoType;
+  isDisabled: boolean;
 }
 
 const CsvDownButton: React.FC<CsvDownButtonProps> = ({
   csvContent,
   csvInfo,
+  isDisabled,
 }) => {
   const handleDownload = () => {
     if (!csvContent) alert("데이터가 없습니다.");
@@ -27,10 +29,13 @@ const CsvDownButton: React.FC<CsvDownButtonProps> = ({
 
   return (
     <button
-      className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+      className={`bg-blue-500 ${
+        isDisabled ? "bg-gray-400 cursor-not-allowed" : "hover:bg-blue-600"
+      } text-white font-semibold py-2 px-4 rounded`}
       onClick={handleDownload}
+      disabled={isDisabled}
     >
-      CSV 파일 다운로드
+      {isDisabled ? "Need Fetch" : "Download CSV"}
     </button>
   );
 };

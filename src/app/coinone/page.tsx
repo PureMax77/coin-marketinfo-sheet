@@ -255,7 +255,11 @@ export default function Home() {
               />
             </div>
             <div className="mt-5">
-              <CsvDownButton csvContent={csvFile} csvInfo={csvInfo} />
+              <CsvDownButton
+                csvContent={csvFile}
+                csvInfo={csvInfo}
+                isDisabled={!csvFile}
+              />
             </div>
           </div>
           <div className="mt-4 flex flex-col">

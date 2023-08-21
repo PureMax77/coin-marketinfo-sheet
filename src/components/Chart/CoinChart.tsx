@@ -54,15 +54,32 @@ const CoinChart: React.FC<{ data: any; currency: string }> = ({
     responsive: true,
     interaction: {
       mode: "index" as const,
-      intersect: false,
     },
-    stacked: false,
-    // plugins: {
-    //   title: {
-    //     display: true,
-    //     text: "Chart.js Line Chart - Multi Axis",
-    //   },
-    // },
+
+    plugins: {
+      tooltip: {
+        enabled: true,
+
+        callbacks: {
+          label: function (context: any) {
+            const data = context.dataset.data;
+            const maxValue = Math.max.apply(null, data);
+            const minValue = Math.min.apply(null, data);
+            // console.log(maxValue, minValue);
+            const label = context.dataset.label || "";
+            if (context.parsed.y === maxValue) {
+              console.log(context.parsed.y);
+              return label + ": " + context.parsed.y + " (최대값)";
+            } else if (context.parsed.y === minValue) {
+              console.log(context.parsed.y);
+              return label + ": " + context.parsed.y + " (최소값)";
+            } else {
+              return label + ": " + context.parsed.y;
+            }
+          },
+        },
+      },
+    },
     scales: {
       y: {
         type: "linear" as const,
@@ -80,7 +97,7 @@ const CoinChart: React.FC<{ data: any; currency: string }> = ({
 
   return (
     <div className='dark:bg-slate-100 '>
-      <Line options={options} data={datas} />;
+      <Line options={options} data={datas} />
     </div>
   );
 };

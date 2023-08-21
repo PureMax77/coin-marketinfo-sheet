@@ -11,10 +11,13 @@ import {
 import { CsvInfoType, CurrencyTypes, IntervalTypes } from "@/types/commonTypes";
 import LoadingScreen from "@/components/Loading";
 import CsvDownButton from "@/components/Button/CsvDownButton";
+import FetchButton from "@/components/Button/FetchButton";
+import CommonSelect from "@/components/Select/CommonSelect";
+import LabelNumInput from "@/components/Input/LabelNumInput";
 
 const DefaultToken = "WEMIX";
 
-export default function Home() {
+export default function Coinone() {
   const [chartData, setChartData] = useState<ChartData[]>([]); // 데이터를 저장할 상태
   const [currency, setCurrency] = useState<CurrencyTypes>(CurrencyTypes.KRW); // 화폐 단위
   const [symbolList, setSymbolList] = useState<string[]>([]); // 코인 종목
@@ -189,12 +192,7 @@ export default function Home() {
       console.error("Error fetching data:", error);
     }
   };
-  // console.log(
-  //   43,
-  //   new Date(chartData[0].timestamp).getMonth(),
-  //   new Date(chartData[0].timestamp).getDate(),
-  //   new Date(chartData[0].timestamp).getHours()
-  // );
+
   useEffect(() => {
     fetchCoinList();
   }, []);
@@ -207,62 +205,30 @@ export default function Home() {
         <div className="container mx-auto p-4">
           <div>
             <div>
-              <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                onClick={fetchData}
-              >
-                Fetch Data
-              </button>
-              <select
+              <FetchButton onClick={fetchData} />
+              <CommonSelect
                 value={currency}
                 onChange={currencyChange}
-                className="py-2 px-4 ml-5 mt-5 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              >
-                {CurrencyArray.map((str, index) => (
-                  <option key={index} value={str}>
-                    {str}
-                  </option>
-                ))}
-              </select>
-              <select
+                dataArray={CurrencyArray}
+              />
+              <CommonSelect
                 value={nowSymbol}
                 onChange={symbolChange}
-                className="py-2 px-4 ml-5 mt-5 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              >
-                {symbolList.map((str, index) => (
-                  <option key={index} value={str}>
-                    {str}
-                  </option>
-                ))}
-              </select>
-              {/* <select
-            value={Interval}
-            onChange={IntervalChange}
-            className="py-2 px-4 ml-5 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          >
-            {IntervalArray.map((str, index) => (
-              <option key={index} value={str}>
-                {str}
-              </option>
-            ))}
-          </select> */}
-              <label className="text-lg ml-5">Year : </label>
-              <input
-                type="number"
-                step="1"
+                dataArray={symbolList}
+              />
+              <LabelNumInput
+                title={"Year"}
+                step={1}
                 value={selectedYear}
                 onChange={handleYearChange}
-                className="w-24 px-2 py-1 mt-5 border rounded-lg"
               />
-              <label className="text-lg ml-5">Month : </label>
-              <input
-                type="number"
-                min="1"
-                max="12"
-                step="1"
+              <LabelNumInput
+                title={"Month"}
+                step={1}
+                min={1}
+                max={12}
                 value={selectedMonth}
                 onChange={handleMonthChange}
-                className="w-16 px-2 py-1 mt-5 border rounded-lg"
               />
             </div>
             <div className="mt-5">

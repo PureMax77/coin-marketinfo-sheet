@@ -13,6 +13,9 @@ const Header = () => {
           <Link href="/coinone" className="text-white hover:underline">
             Coinone
           </Link>
+          <Link href="/mexc" className="text-white hover:underline">
+            MEXC
+          </Link>
           <button
             className="text-white hover:underline"
             onClick={() => {

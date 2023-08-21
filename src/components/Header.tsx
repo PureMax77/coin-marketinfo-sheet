@@ -14,7 +14,7 @@ const Header = () => {
           Coin MarketInfo Sheet
         </Link>
 
-        <nav className='md:flex space-y-2 md:space-y-0 md:space-x-4 space-x-4 '>
+        <nav className='flex space-y-2 md:space-y-0 md:space-x-4 space-x-4 justify-center items-center'>
           <DarkModeToggle />
           <Link
             href='/coinone'

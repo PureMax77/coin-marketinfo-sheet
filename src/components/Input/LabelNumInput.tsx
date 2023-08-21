@@ -19,15 +19,15 @@ const LabelNumInput: React.FC<LabelNumInputProps> = ({
 }) => {
   return (
     <>
-      <label className="text-lg ml-5">{title} : </label>
+      <label className='text-lg ml-5 dark:text-white'>{title} : </label>
       <input
-        type="number"
+        type='number'
         step={step}
         value={value}
         onChange={onChange}
         min={min}
         max={max}
-        className="w-24 px-2 py-1 mt-5 border rounded-lg"
+        className='w-24 px-2 py-1 mt-5 border rounded-lg'
       />
     </>
   );

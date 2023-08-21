@@ -31,10 +31,9 @@ const CsvDownButton: React.FC<CsvDownButtonProps> = ({
     <button
       className={`bg-blue-500 ${
         isDisabled ? "bg-gray-400 cursor-not-allowed" : "hover:bg-blue-600"
-      } text-white font-semibold py-2 px-4 rounded`}
+      } text-white font-semibold py-2 px-4 rounded dark:bg-indigo-800`}
       onClick={handleDownload}
-      disabled={isDisabled}
-    >
+      disabled={isDisabled}>
       {isDisabled ? "Need Fetch" : "Download CSV"}
     </button>
   );

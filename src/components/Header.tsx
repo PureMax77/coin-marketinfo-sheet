@@ -1,27 +1,36 @@
 "use client";
 
 import Link from "next/link";
+import DarkModeToggle from "./Button/DarkModeToggle";
+import { usePathname } from "next/navigation";
 
 const Header = () => {
+  const pathname = usePathname();
+
   return (
-    <header className="bg-blue-500 py-4 px-6 md:px-12">
-      <div className="flex items-center justify-between">
-        <Link href="/" className="text-white font-semibold text-lg">
+    <header className='bg-blue-500 py-4 px-6 md:px-12 dark:bg-gray-700'>
+      <div className='flex items-center justify-between'>
+        <Link href='/' className='text-white font-semibold text-lg'>
           Coin MarketInfo Sheet
         </Link>
-        <nav className="md:flex space-y-2 md:space-y-0 md:space-x-4">
-          <Link href="/coinone" className="text-white hover:underline">
+
+        <nav className='md:flex space-y-2 md:space-y-0 md:space-x-4 space-x-4 '>
+          <DarkModeToggle />
+          <Link
+            href='/coinone'
+            className={`text-white hover:underline ${
+              pathname === "/coinone" && "underline"
+            }`}>
             Coinone
           </Link>
-          <Link href="/mexc" className="text-white hover:underline">
+          <Link href='/mexc' className='text-white hover:underline'>
             MEXC
           </Link>
           <button
-            className="text-white hover:underline"
+            className='text-white hover:underline'
             onClick={() => {
               alert("준비중입니다...");
-            }}
-          >
+            }}>
             Upbit
           </button>
           {/* <Link href="/upbit" className="text-white hover:underline">

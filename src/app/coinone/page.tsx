@@ -14,6 +14,7 @@ import CsvDownButton from "@/components/Button/CsvDownButton";
 import FetchButton from "@/components/Button/FetchButton";
 import CommonSelect from "@/components/Select/CommonSelect";
 import LabelNumInput from "@/components/Input/LabelNumInput";
+import CoinChart from "@/components/Chart/CoinChart";
 
 const DefaultToken = "WEMIX";
 
@@ -202,7 +203,7 @@ export default function Coinone() {
       {symbolList.length === 0 ? (
         <LoadingScreen />
       ) : (
-        <div className="container mx-auto p-4">
+        <div className='container mx-auto p-4'>
           <div>
             <div>
               <FetchButton onClick={fetchData} />
@@ -231,7 +232,7 @@ export default function Coinone() {
                 onChange={handleMonthChange}
               />
             </div>
-            <div className="mt-5">
+            <div className='mt-5'>
               <CsvDownButton
                 csvContent={csvFile}
                 csvInfo={csvInfo}
@@ -239,17 +240,17 @@ export default function Coinone() {
               />
             </div>
           </div>
-          <div className="mt-4 flex flex-col">
+          <div className='mt-4 flex flex-col'>
             {chartData.map((entry, index) => (
               <div
                 key={index}
-                className="bg-gray-200 p-2 m-2 inline-block text-center"
-              >
+                className='bg-gray-200 p-2 m-2 inline-block text-center'>
                 {new Date(entry.timestamp).toLocaleString()} &rarr; 종가:{" "}
                 {entry.close}
               </div>
             ))}
           </div>
+          <CoinChart data={chartData} currency={currency} />
         </div>
       )}
     </div>

@@ -15,6 +15,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { ChartOptions } from "chart.js";
 
 ChartJS.register(
   CategoryScale,
@@ -30,7 +31,7 @@ const CoinChart: React.FC<{ data: any; currency: string }> = ({
   data,
   currency,
 }) => {
-  if (!data && !currency) return <div>not Data</div>;
+  if (!data) return <div>not Data</div>;
   console.log(data, currency);
   const labels = data.map((data: any) => {
     const time = new Date(data.timestamp).toLocaleString();
@@ -50,43 +51,125 @@ const CoinChart: React.FC<{ data: any; currency: string }> = ({
       },
     ],
   };
-  const options = {
+  const options: ChartOptions = {
     responsive: true,
     interaction: {
-      mode: "index" as const,
+      mode: "index",
     },
+    animation: {
+      duration: 1,
+      onComplete: (context) => {
+        let chart = context.chart;
+        let ctx = chart.ctx;
 
+        datas.datasets.forEach((dataset, i) => {
+          let meta = chart.getDatasetMeta(i);
+          // 종가들만 모아서 배열 추출
+          const newData = meta.data.map((data, index) => {
+            return dataset.data[index];
+          });
+          if (newData.length < 1) {
+            return console.error("Invalid Values");
+          }
+          const max = Math.max(...newData);
+          const min = Math.min(...newData);
+          console.log(max, min);
+
+          meta.data.forEach((bar, index) => {
+            let datasetData = Number(dataset.data[index]);
+            if (max === datasetData) {
+              // 검정색 사각형 그리기
+              ctx.fillStyle = "rgba(0, 0, 0, 0.7)"; // 반투명 검정색 설정
+              const rectWidth = 100;
+              const rectHeight = 30;
+              const rectX = bar.x - rectWidth / 2;
+              const rectY = bar.y - rectHeight - 10;
+              const borderRadius = 10;
+
+              // 둥근 테두리를 가진 사각형 그리기
+              ctx.beginPath();
+              ctx.moveTo(rectX + borderRadius, rectY);
+              ctx.arcTo(
+                rectX + rectWidth,
+                rectY,
+                rectX + rectWidth,
+                rectY + rectHeight,
+                borderRadius
+              );
+              ctx.arcTo(
+                rectX + rectWidth,
+                rectY + rectHeight,
+                rectX,
+                rectY + rectHeight,
+                borderRadius
+              );
+              ctx.arcTo(rectX, rectY + rectHeight, rectX, rectY, borderRadius);
+              ctx.arcTo(rectX, rectY, rectX + rectWidth, rectY, borderRadius);
+              ctx.closePath();
+              ctx.fill();
+
+              // 흰색 텍스트 그리기
+              ctx.fillStyle = "white"; // 흰색 텍스트 설정
+              ctx.fillText(
+                `최댓값: ${datasetData}`,
+                bar.x - 35,
+                bar.y - rectHeight + 5
+              );
+            } else if (min === datasetData) {
+              // 검정색 사각형 그리기
+              ctx.fillStyle = "rgba(0, 0, 0, 0.7)"; // 반투명 검정색 설정
+              const rectWidth = 100;
+              const rectHeight = 30;
+              const rectX = bar.x - rectWidth / 2;
+              const rectY = bar.y - rectHeight - 10;
+              const borderRadius = 10;
+
+              // 둥근 테두리를 가진 사각형 그리기
+              ctx.beginPath();
+              ctx.moveTo(rectX + borderRadius, rectY);
+              ctx.arcTo(
+                rectX + rectWidth,
+                rectY,
+                rectX + rectWidth,
+                rectY + rectHeight,
+                borderRadius
+              );
+              ctx.arcTo(
+                rectX + rectWidth,
+                rectY + rectHeight,
+                rectX,
+                rectY + rectHeight,
+                borderRadius
+              );
+              ctx.arcTo(rectX, rectY + rectHeight, rectX, rectY, borderRadius);
+              ctx.arcTo(rectX, rectY, rectX + rectWidth, rectY, borderRadius);
+              ctx.closePath();
+              ctx.fill();
+
+              // 흰색 텍스트 그리기
+              ctx.fillStyle = "white"; // 흰색 텍스트 설정
+              ctx.fillText(
+                `최댓값: ${datasetData}`,
+                bar.x - 35,
+                bar.y - rectHeight + 5
+              );
+            }
+          });
+        });
+      },
+    },
     plugins: {
       tooltip: {
-        enabled: true,
-
-        callbacks: {
-          label: function (context: any) {
-            const data = context.dataset.data;
-            const maxValue = Math.max.apply(null, data);
-            const minValue = Math.min.apply(null, data);
-            // console.log(maxValue, minValue);
-            const label = context.dataset.label || "";
-            if (context.parsed.y === maxValue) {
-              console.log(context.parsed.y);
-              return label + ": " + context.parsed.y + " (최대값)";
-            } else if (context.parsed.y === minValue) {
-              console.log(context.parsed.y);
-              return label + ": " + context.parsed.y + " (최소값)";
-            } else {
-              return label + ": " + context.parsed.y;
-            }
-          },
-        },
+        enabled: false,
       },
     },
     scales: {
       y: {
-        type: "linear" as const,
+        type: "linear",
         display: true,
-        position: "left" as const,
+        position: "left",
         ticks: {
-          callback: function (value: any) {
+          callback: function (value) {
             // 변경하고자 하는 단위로 변환하는 로직을 작성
             return value + ` ${currency}`;
           },

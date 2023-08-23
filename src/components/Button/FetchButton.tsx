@@ -1,4 +1,3 @@
-import { CsvInfoType } from "@/types/commonTypes";
 import React from "react";
 
 interface FetchButtonProps {

@@ -109,8 +109,7 @@ export default function Coinone() {
     });
 
     // CSV 헤더 생성
-    const csvHeader =
-      "market,symbol,year,month,day,open,high,low,close,target_volume,quote_volume\n";
+    const csvHeader = "market,symbol,year,month,day,close\n";
 
     // CSV 데이터 생성
     const csvData = filteredData.map((data) => {
@@ -119,7 +118,7 @@ export default function Coinone() {
       const month = date.getMonth() + 1;
       const day = date.getDate();
 
-      return `${market},${symbol},${year},${month},${day},${data.open},${data.high},${data.low},${data.close},${data.target_volume},${data.quote_volume}`;
+      return `${market},${symbol},${year},${month},${day},${data.close}`;
     });
 
     // 최종 CSV 문자열 생성
@@ -217,7 +216,7 @@ export default function Coinone() {
       {symbolList.length === 0 ? (
         <LoadingScreen />
       ) : (
-        <div className='container mx-auto p-4'>
+        <div className="container mx-auto p-4">
           <div>
             <div>
               <FetchButton onClick={fetchData} />
@@ -246,7 +245,7 @@ export default function Coinone() {
                 onChange={handleMonthChange}
               />
             </div>
-            <div className='mt-5'>
+            <div className="mt-5">
               <CsvDownButton
                 exchange={"Coinone"}
                 csvContent={csvFile}
@@ -255,23 +254,33 @@ export default function Coinone() {
               />
             </div>
           </div>
-          <div className='my-2 dark:text-white '>종가: 23시 기준</div>
-          <div className='mb-10 grid lg:grid-cols-7 sm:grid-cols-5 grid-cols-4 gap-4'>
-            {chartData.map((entry, index) => {
-              const dates = new Date(entry.timestamp).toLocaleString();
-              return (
-                <div
-                  key={index}
-                  className='bg-gray-200 p-2 text-center rounded-sm flex flex-col'>
-                  <span>{dates.slice(0, dates.indexOf("오"))}</span>
-                  <span>
-                    {Number(entry.close).toLocaleString("en")} {currency}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-          <CoinChart data={chartData} currency={currency} />
+          {chartData.length > 0 && (
+            <>
+              <div className="my-2 dark:text-white mt-10 font-medium">
+                종가: 24시 기준
+              </div>
+              <div className="mb-10 grid lg:grid-cols-7 sm:grid-cols-5 grid-cols-4 gap-4">
+                {chartData.map((entry, index) => {
+                  const date = new Date(entry.timestamp);
+                  const year = date.getFullYear();
+                  const month = date.getMonth() + 1; // 월은 0부터 시작하므로 1을 더해줍니다.
+                  const day = date.getDate();
+                  return (
+                    <div
+                      key={index}
+                      className="bg-gray-200 p-2 text-center rounded-sm flex flex-col"
+                    >
+                      <span>{`${year}.${month}.${day}`}</span>
+                      <span>
+                        {entry.close} {csvInfo.market}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              <CoinChart data={chartData} currency={csvInfo.market} />
+            </>
+          )}
         </div>
       )}
     </div>

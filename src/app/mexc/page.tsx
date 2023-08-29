@@ -19,8 +19,9 @@ import FetchButton from "@/components/Button/FetchButton";
 import CommonSelect from "@/components/Select/CommonSelect";
 import LabelNumInput from "@/components/Input/LabelNumInput";
 import { coinListFilter } from "@/utils/mexcUtils";
+import CoinChart from "@/components/Chart/CoinChart";
 
-const DefaultToken = "WEMIX";
+const DefaultToken = "MEGA";
 
 export default function MEXC() {
   const [chartData, setChartData] = useState<ChartData_Mexc[]>([]); // 데이터를 저장할 상태
@@ -249,23 +250,33 @@ export default function MEXC() {
               />
             </div>
           </div>
-          <div className="mt-4 flex flex-col">
-            {chartData.map((entry, index) => {
-              const date = new Date(entry.openTime);
-              const year = date.getFullYear();
-              const month = date.getMonth() + 1; // 월은 0부터 시작하므로 1을 더해줍니다.
-              const day = date.getDate();
-              return (
-                <div
-                  key={index}
-                  className="bg-gray-200 p-2 m-2 inline-block text-center"
-                >
-                  {`${year}년 ${month}월 ${day}일`} &rarr; {entry.close}{" "}
-                  {csvInfo.market}
-                </div>
-              );
-            })}
-          </div>
+          {chartData.length > 0 && (
+            <>
+              <div className="my-2 dark:text-white mt-10 font-medium">
+                종가: 오전 9시 기준
+              </div>
+              <div className="mb-10 grid lg:grid-cols-7 sm:grid-cols-5 grid-cols-4 gap-4">
+                {chartData.map((entry, index) => {
+                  const date = new Date(entry.openTime);
+                  const year = date.getFullYear();
+                  const month = date.getMonth() + 1; // 월은 0부터 시작하므로 1을 더해줍니다.
+                  const day = date.getDate();
+                  return (
+                    <div
+                      key={index}
+                      className="bg-gray-200 p-2 text-center rounded-sm flex flex-col"
+                    >
+                      <span>{`${year}.${month}.${day}`}</span>
+                      <span>
+                        {entry.close} {csvInfo.market}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              <CoinChart data={chartData} currency={csvInfo.market} />
+            </>
+          )}
         </div>
       )}
     </div>

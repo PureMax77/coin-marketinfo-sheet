@@ -16,6 +16,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { ChartOptions } from "chart.js";
+import { usePathname, useRouter } from "next/navigation";
 
 ChartJS.register(
   CategoryScale,
@@ -31,10 +32,11 @@ const CoinChart: React.FC<{ data: any; currency: string }> = ({
   data,
   currency,
 }) => {
-  if (!data) return <div>not Data</div>;
-  console.log(data, currency);
+  const path = usePathname();
+  const timeType = path.includes("mexc") ? "openTime" : "timestamp";
+
   const labels = data.map((data: any) => {
-    const time = new Date(data.timestamp).toLocaleString();
+    const time = new Date(data[timeType]).toLocaleString();
     return time.slice(5, time.indexOf("오") - 2);
   });
   const datas = {
@@ -73,7 +75,6 @@ const CoinChart: React.FC<{ data: any; currency: string }> = ({
           }
           const max = Math.max(...newData);
           const min = Math.min(...newData);
-          console.log(max, min);
 
           meta.data.forEach((bar, index) => {
             let datasetData = Number(dataset.data[index]);
@@ -179,8 +180,8 @@ const CoinChart: React.FC<{ data: any; currency: string }> = ({
   };
 
   return (
-    <div className='dark:bg-slate-100 '>
-      <Line options={options} data={datas} />
+    <div className="dark:bg-slate-100 ">
+      <Line options={options as any} data={datas} />
     </div>
   );
 };

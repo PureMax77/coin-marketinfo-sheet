@@ -1,6 +1,15 @@
-export enum CurrencyTypes {
+export enum CoinoneCurrencyTypes {
   KRW = "KRW",
   BTC = "BTC",
+}
+
+export enum MexcCurrencyTypes {
+  USDT = "USDT",
+  USDC = "USDC",
+  ETH = "ETH",
+  BTC = "BTC",
+  BUSD = "BUSD",
+  TUSD = "TUSD",
 }
 
 export enum IntervalTypes {
@@ -24,3 +33,5 @@ export interface CsvInfoType {
   year: number;
   month: number;
 }
+
+export type MexcCoinMapType = Map<string, string[]>;

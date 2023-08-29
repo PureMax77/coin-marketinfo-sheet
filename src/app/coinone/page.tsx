@@ -240,15 +240,21 @@ export default function Coinone() {
               />
             </div>
           </div>
-          <div className='mt-4 flex flex-col'>
-            {chartData.map((entry, index) => (
-              <div
-                key={index}
-                className='bg-gray-200 p-2 m-2 inline-block text-center'>
-                {new Date(entry.timestamp).toLocaleString()} &rarr; 종가:{" "}
-                {entry.close}
-              </div>
-            ))}
+          <div className='my-2 dark:text-white '>종가: 23시 기준</div>
+          <div className='mb-10 grid lg:grid-cols-7 sm:grid-cols-5 grid-cols-4 gap-4'>
+            {chartData.map((entry, index) => {
+              const dates = new Date(entry.timestamp).toLocaleString();
+              return (
+                <div
+                  key={index}
+                  className='bg-gray-200 p-2 text-center rounded-sm flex flex-col'>
+                  <span>{dates.slice(0, dates.indexOf("오"))}</span>
+                  <span>
+                    {Number(entry.close).toLocaleString("en")} {currency}
+                  </span>
+                </div>
+              );
+            })}
           </div>
           <CoinChart data={chartData} currency={currency} />
         </div>

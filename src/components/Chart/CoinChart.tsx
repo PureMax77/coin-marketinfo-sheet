@@ -54,7 +54,7 @@ const CoinChart: React.FC<{ data: any; currency: string }> = ({
   const options: ChartOptions = {
     responsive: true,
     interaction: {
-      mode: "index",
+      mode: "index" as const,
     },
     animation: {
       duration: 1,
@@ -149,7 +149,7 @@ const CoinChart: React.FC<{ data: any; currency: string }> = ({
               // 흰색 텍스트 그리기
               ctx.fillStyle = "white"; // 흰색 텍스트 설정
               ctx.fillText(
-                `최댓값: ${datasetData}`,
+                `최솟값: ${datasetData}`,
                 bar.x - 35,
                 bar.y - rectHeight + 5
               );
@@ -160,7 +160,7 @@ const CoinChart: React.FC<{ data: any; currency: string }> = ({
     },
     plugins: {
       tooltip: {
-        enabled: false,
+        enabled: true,
       },
     },
     scales: {

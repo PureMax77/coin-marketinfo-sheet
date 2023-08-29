@@ -2,12 +2,14 @@ import { CsvInfoType } from "@/types/commonTypes";
 import React from "react";
 
 interface CsvDownButtonProps {
+  exchange: string;
   csvContent: string;
   csvInfo: CsvInfoType;
   isDisabled: boolean;
 }
 
 const CsvDownButton: React.FC<CsvDownButtonProps> = ({
+  exchange,
   csvContent,
   csvInfo,
   isDisabled,
@@ -20,7 +22,7 @@ const CsvDownButton: React.FC<CsvDownButtonProps> = ({
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const downloadLink = document.createElement("a");
     downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = `${symbol}_${market}_${year}${month}.csv`;
+    downloadLink.download = `${exchange}_${symbol}_${market}_${year}${month}.csv`;
     downloadLink.style.display = "none";
     document.body.appendChild(downloadLink);
     downloadLink.click();
@@ -33,7 +35,8 @@ const CsvDownButton: React.FC<CsvDownButtonProps> = ({
         isDisabled ? "bg-gray-400 cursor-not-allowed" : "hover:bg-blue-600"
       } text-white font-semibold py-2 px-4 rounded dark:bg-indigo-800`}
       onClick={handleDownload}
-      disabled={isDisabled}>
+      disabled={isDisabled}
+    >
       {isDisabled ? "Need Fetch" : "Download CSV"}
     </button>
   );

@@ -4,3 +4,10 @@
   status = 200
   force = true
   queryString = "retain"
+
+[[redirects]]
+  from = "/api/mexc/*"
+  to = "https://api.mexc.com/api/v3/:splat"
+  status = 200
+  force = true
+  queryString = "retain"

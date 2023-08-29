@@ -1,33 +1,33 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { http } from "../api/http";
 import {
   CandleChartRes,
-  ChartData,
-  CoinListData,
-  coinListRes_Coinone,
+  ChartData_Mexc,
+  coinListRes_Mexc,
 } from "@/types/apiTypes";
 import {
   CsvInfoType,
-  CoinoneCurrencyTypes,
+  MexcCurrencyTypes,
   IntervalTypes,
+  MexcCoinMapType,
 } from "@/types/commonTypes";
 import LoadingScreen from "@/components/Loading";
 import CsvDownButton from "@/components/Button/CsvDownButton";
 import FetchButton from "@/components/Button/FetchButton";
 import CommonSelect from "@/components/Select/CommonSelect";
 import LabelNumInput from "@/components/Input/LabelNumInput";
-import CoinChart from "@/components/Chart/CoinChart";
+import { coinListFilter } from "@/utils/mexcUtils";
 
 const DefaultToken = "WEMIX";
 
-export default function Coinone() {
-  const [chartData, setChartData] = useState<ChartData[]>([]); // 데이터를 저장할 상태
-  const [currency, setCurrency] = useState<CoinoneCurrencyTypes>(
-    CoinoneCurrencyTypes.KRW
+export default function MEXC() {
+  const [chartData, setChartData] = useState<ChartData_Mexc[]>([]); // 데이터를 저장할 상태
+  const [currency, setCurrency] = useState<MexcCurrencyTypes>(
+    MexcCurrencyTypes.USDT
   ); // 화폐 단위
-  const [symbolList, setSymbolList] = useState<string[]>([]); // 코인 종목
+  const [coinMapList, setCoinMapList] = useState<MexcCoinMapType>(new Map()); // 코인 종목
   const [nowSymbol, setNowSymbol] = useState<string>(DefaultToken);
   const [Interval, setInterval] = useState<IntervalTypes>(IntervalTypes.T1H);
   const [selectedYear, setSelectedYear] = useState<number>(
@@ -39,13 +39,13 @@ export default function Coinone() {
   const [csvFile, setCsvFile] = useState<string>("");
   const [csvInfo, setCsvInfo] = useState<CsvInfoType>({
     symbol: DefaultToken,
-    market: CoinoneCurrencyTypes.KRW,
+    market: MexcCurrencyTypes.USDT,
     year: 2023,
     month: 1,
   });
 
   const CurrencyArray = useMemo(
-    () => Object.values(CoinoneCurrencyTypes) as string[],
+    () => Object.values(MexcCurrencyTypes) as string[],
     []
   );
   const IntervalArray = useMemo(
@@ -77,11 +77,17 @@ export default function Coinone() {
     }
   };
   const currencyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    if (event.target.value !== CoinoneCurrencyTypes.KRW) {
-      alert("코인원은 현재 KRW 마켓만 지원합니다.");
-      return;
+    const newCurrency = event.target.value as MexcCurrencyTypes;
+    setCurrency(newCurrency);
+
+    // 현재 nowSymbol이 바뀐 market(커런시)에 있는지
+    const newCoinList = coinMapList.get(newCurrency)!;
+    const newSymbol = newCoinList.find((a) => a === nowSymbol);
+    if (!newSymbol) {
+      // 새로 선택한 market에 기존에 선택된 심볼이 없으면 첫번째 걸로 대체
+      setNowSymbol(newCoinList[0]);
     }
-    setCurrency(event.target.value as CoinoneCurrencyTypes);
+
     clearData();
   };
   const symbolChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -94,7 +100,7 @@ export default function Coinone() {
   };
 
   const makeCSV = (
-    filteredData: ChartData[],
+    filteredData: ChartData_Mexc[],
     market: string,
     symbol: string,
     year: number,
@@ -109,17 +115,16 @@ export default function Coinone() {
     });
 
     // CSV 헤더 생성
-    const csvHeader =
-      "market,symbol,year,month,day,open,high,low,close,target_volume,quote_volume\n";
+    const csvHeader = "market,symbol,year,month,day,close\n";
 
     // CSV 데이터 생성
     const csvData = filteredData.map((data) => {
-      const date = new Date(data.timestamp);
+      const date = new Date(data.openTime);
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
 
-      return `${market},${symbol},${year},${month},${day},${data.open},${data.high},${data.low},${data.close},${data.target_volume},${data.quote_volume}`;
+      return `${market},${symbol},${year},${month},${day},${data.close}`;
     });
 
     // 최종 CSV 문자열 생성
@@ -137,72 +142,61 @@ export default function Coinone() {
       return;
     }
 
-    let tmpData: ChartData[] = [];
+    // Data Type [Open time, Open, High,	Low, Close, Volume,	Close time, Quote asset volume]
+    let tmpData: any[][] = [];
 
-    // 1달치 데이터를 충분히 불러오기 위해서 3번 돌림
-    for (let i = 0; i < 4; i++) {
-      const isNow =
-        new Date().getFullYear() === selectedYear &&
-        new Date().getMonth() + 1 === selectedMonth; // 선택한 날짜가 현재와 같은지
-      const baseStamp = isNow
-        ? new Date().getTime()
-        : new Date(selectedYear, selectedMonth, 1).getTime(); // 선택한 달의 다음달 첫날을 지정해서 범위를 러프하게 잡음
-      const time = baseStamp - i * 1000 * 3600 * 200; // 1시간봉 기준으로 200개씩 불러와져서
+    const startTime = new Date(selectedYear, selectedMonth - 1, 1, 9).getTime(); // 선택한 달의 다음달 첫날을 지정해서 범위를 러프하게 잡음
+    // const endTime = new Date(selectedYear, selectedMonth, 1, 9).getTime(); // 선택한 달의 다음달 첫날을 지정해서 범위를 러프하게 잡음
 
-      try {
-        const jsonData = await http<CandleChartRes>(
-          `api/coinone/chart/${currency}/${nowSymbol}?interval=${Interval}&timestamp=${time}`
-        );
-        if (jsonData.result === "success") {
-          tmpData = [...tmpData, ...jsonData.chart];
-        } else {
-          console.error("API request failed:", jsonData);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+    try {
+      const jsonData = await http<any[][]>(
+        `api/mexc/klines?symbol=${
+          nowSymbol + currency
+        }&interval=1d&startTime=${startTime}&limit=1000`
+      );
+      tmpData = jsonData;
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
 
-    if (tmpData.length === 0) {
-      alert("해당 데이터가 없습니다.");
-      return;
-    }
-
-    // 한국시간 기준 오후12시 (1시간봉 11시 종가) 필터링
+    // 한국시간 기준 오전12시 (1시간봉 11시 종가) 필터링
     const filteredData = tmpData.filter((data) => {
-      // timestamp로부터 Date 객체 생성
-      const date = new Date(data.timestamp);
+      // openTime Date 객체 생성
+      const date = new Date(data[0]);
 
       // 원하는 조건 체크: 달과 시간
       const isTargetYaer = date.getFullYear() === selectedYear;
       const isTargetMonth = date.getMonth() + 1 === selectedMonth; // getMonth()는 0부터 시작하므로 +1 필요
-      const isTargetHour = date.getHours() === 23;
 
       // 조건 충족 여부 반환
-      return isTargetYaer && isTargetMonth && isTargetHour;
+      return isTargetYaer && isTargetMonth;
+    });
+
+    if (filteredData.length === 0) {
+      alert("해당 데이터가 없습니다.");
+      return;
+    }
+
+    // 형식 변경
+    const newData = filteredData.map((item) => {
+      const data: ChartData_Mexc = { openTime: item[0], close: item[4] };
+      return data;
     });
 
     // 날짜 sort
-    filteredData.sort((a, b) => a.timestamp - b.timestamp);
+    newData.sort((a, b) => a.openTime - b.openTime);
 
     // csvFile 만들기
-    makeCSV(filteredData, currency, nowSymbol, selectedYear, selectedMonth);
+    makeCSV(newData, currency, nowSymbol, selectedYear, selectedMonth);
 
-    setChartData(filteredData);
+    setChartData(newData);
   };
 
   const fetchCoinList = async () => {
     try {
-      const jsonData = await http<coinListRes_Coinone>(
-        `api/coinone/currencies`
-      );
-      if (jsonData.result === "success") {
-        setSymbolList(
-          jsonData.currencies.map((data) => data.symbol).sort() as any
-        );
-      } else {
-        console.error("API request failed:", jsonData);
-      }
+      const jsonData = await http<coinListRes_Mexc>(`api/mexc/exchangeInfo`);
+      const coinMapData = coinListFilter(jsonData.symbols);
+      setCoinMapList(coinMapData);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -214,10 +208,10 @@ export default function Coinone() {
 
   return (
     <div>
-      {symbolList.length === 0 ? (
+      {coinMapList.size === 0 ? (
         <LoadingScreen />
       ) : (
-        <div className='container mx-auto p-4'>
+        <div className="container mx-auto p-4">
           <div>
             <div>
               <FetchButton onClick={fetchData} />
@@ -229,7 +223,7 @@ export default function Coinone() {
               <CommonSelect
                 value={nowSymbol}
                 onChange={symbolChange}
-                dataArray={symbolList}
+                dataArray={coinMapList.get(currency)!}
               />
               <LabelNumInput
                 title={"Year"}
@@ -246,32 +240,32 @@ export default function Coinone() {
                 onChange={handleMonthChange}
               />
             </div>
-            <div className='mt-5'>
+            <div className="mt-5">
               <CsvDownButton
-                exchange={"Coinone"}
+                exchange={"MEXC"}
                 csvContent={csvFile}
                 csvInfo={csvInfo}
                 isDisabled={!csvFile}
               />
             </div>
           </div>
-          <div className='my-2 dark:text-white '>종가: 23시 기준</div>
-          <div className='mb-10 grid lg:grid-cols-7 sm:grid-cols-5 grid-cols-4 gap-4'>
+          <div className="mt-4 flex flex-col">
             {chartData.map((entry, index) => {
-              const dates = new Date(entry.timestamp).toLocaleString();
+              const date = new Date(entry.openTime);
+              const year = date.getFullYear();
+              const month = date.getMonth() + 1; // 월은 0부터 시작하므로 1을 더해줍니다.
+              const day = date.getDate();
               return (
                 <div
                   key={index}
-                  className='bg-gray-200 p-2 text-center rounded-sm flex flex-col'>
-                  <span>{dates.slice(0, dates.indexOf("오"))}</span>
-                  <span>
-                    {Number(entry.close).toLocaleString("en")} {currency}
-                  </span>
+                  className="bg-gray-200 p-2 m-2 inline-block text-center"
+                >
+                  {`${year}년 ${month}월 ${day}일`} &rarr; {entry.close}{" "}
+                  {csvInfo.market}
                 </div>
               );
             })}
           </div>
-          <CoinChart data={chartData} currency={currency} />
         </div>
       )}
     </div>

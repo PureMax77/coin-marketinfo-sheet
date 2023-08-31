@@ -43,7 +43,7 @@ const CoinChart: React.FC<{ data: any; currency: string }> = ({
     labels,
     datasets: [
       {
-        label: "종가",
+        label: "종가(" + currency + ")",
         data: data.map((_data: any) => {
           return _data.close;
         }),
@@ -82,13 +82,13 @@ const CoinChart: React.FC<{ data: any; currency: string }> = ({
               // 흰색 텍스트 그리기
               ctx.fillStyle = "black"; // 흰색 텍스트 설정
               ctx.font = "normal bold 18px sans-serif";
-              ctx.fillText(`최댓값: ${datasetData}`, bar.x - 50, bar.y - 15);
+              ctx.fillText(`Max: ${datasetData}`, bar.x - 50, bar.y - 15);
             } else if (min === datasetData) {
               // 검정색 사각형 그리기
 
               // 흰색 텍스트 그리기
               ctx.fillStyle = "black"; // 흰색 텍스트 설정
-              ctx.fillText(`최솟값: ${datasetData}`, bar.x - 50, bar.y +20);
+              ctx.fillText(`Min: ${datasetData}`, bar.x - 50, bar.y + 20);
             }
           });
         });
@@ -107,7 +107,7 @@ const CoinChart: React.FC<{ data: any; currency: string }> = ({
         ticks: {
           callback: function (value) {
             // 변경하고자 하는 단위로 변환하는 로직을 작성
-            return value + ` ${currency}`;
+            return value;
           },
         },
       },

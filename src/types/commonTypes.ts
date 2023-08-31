@@ -12,6 +12,12 @@ export enum MexcCurrencyTypes {
   TUSD = "TUSD",
 }
 
+export enum UpbitCurrencyTypes {
+  USDT = "USDT",
+  BTC = "BTC",
+  KRW = "KRW",
+}
+
 export enum IntervalTypes {
   T1M = "1m",
   T3M = "3m",
@@ -35,3 +41,4 @@ export interface CsvInfoType {
 }
 
 export type MexcCoinMapType = Map<string, string[]>;
+export type UpbitCoinMapType = Map<string, string[]>;

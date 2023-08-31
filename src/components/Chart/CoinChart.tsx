@@ -33,7 +33,12 @@ const CoinChart: React.FC<{ data: any; currency: string }> = ({
   currency,
 }) => {
   const path = usePathname();
-  const timeType = path.includes("mexc") ? "openTime" : "timestamp";
+  const timeType = path.includes("mexc")
+    ? "openTime"
+    : path.includes("upbit")
+    ? "candle_date_time_kst"
+    : "timestamp";
+  const dataType = path.includes("upbit") ? "trade_price" : "close";
 
   const labels = data.map((data: any) => {
     const time = new Date(data[timeType]).toLocaleString();
@@ -45,7 +50,7 @@ const CoinChart: React.FC<{ data: any; currency: string }> = ({
       {
         label: "종가(" + currency + ")",
         data: data.map((_data: any) => {
-          return _data.close;
+          return _data[dataType];
         }),
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",

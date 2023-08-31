@@ -79,81 +79,16 @@ const CoinChart: React.FC<{ data: any; currency: string }> = ({
           meta.data.forEach((bar, index) => {
             let datasetData = Number(dataset.data[index]);
             if (max === datasetData) {
-              // 검정색 사각형 그리기
-              ctx.fillStyle = "rgba(0, 0, 0, 0.7)"; // 반투명 검정색 설정
-              const rectWidth = 100;
-              const rectHeight = 30;
-              const rectX = bar.x - rectWidth / 2;
-              const rectY = bar.y - rectHeight - 10;
-              const borderRadius = 10;
-
-              // 둥근 테두리를 가진 사각형 그리기
-              ctx.beginPath();
-              ctx.moveTo(rectX + borderRadius, rectY);
-              ctx.arcTo(
-                rectX + rectWidth,
-                rectY,
-                rectX + rectWidth,
-                rectY + rectHeight,
-                borderRadius
-              );
-              ctx.arcTo(
-                rectX + rectWidth,
-                rectY + rectHeight,
-                rectX,
-                rectY + rectHeight,
-                borderRadius
-              );
-              ctx.arcTo(rectX, rectY + rectHeight, rectX, rectY, borderRadius);
-              ctx.arcTo(rectX, rectY, rectX + rectWidth, rectY, borderRadius);
-              ctx.closePath();
-              ctx.fill();
-
               // 흰색 텍스트 그리기
-              ctx.fillStyle = "white"; // 흰색 텍스트 설정
-              ctx.fillText(
-                `최댓값: ${datasetData}`,
-                bar.x - 35,
-                bar.y - rectHeight + 5
-              );
+              ctx.fillStyle = "black"; // 흰색 텍스트 설정
+              ctx.font = "normal bold 18px sans-serif";
+              ctx.fillText(`최댓값: ${datasetData}`, bar.x - 50, bar.y - 15);
             } else if (min === datasetData) {
               // 검정색 사각형 그리기
-              ctx.fillStyle = "rgba(0, 0, 0, 0.7)"; // 반투명 검정색 설정
-              const rectWidth = 100;
-              const rectHeight = 30;
-              const rectX = bar.x - rectWidth / 2;
-              const rectY = bar.y - rectHeight - 10;
-              const borderRadius = 10;
-
-              // 둥근 테두리를 가진 사각형 그리기
-              ctx.beginPath();
-              ctx.moveTo(rectX + borderRadius, rectY);
-              ctx.arcTo(
-                rectX + rectWidth,
-                rectY,
-                rectX + rectWidth,
-                rectY + rectHeight,
-                borderRadius
-              );
-              ctx.arcTo(
-                rectX + rectWidth,
-                rectY + rectHeight,
-                rectX,
-                rectY + rectHeight,
-                borderRadius
-              );
-              ctx.arcTo(rectX, rectY + rectHeight, rectX, rectY, borderRadius);
-              ctx.arcTo(rectX, rectY, rectX + rectWidth, rectY, borderRadius);
-              ctx.closePath();
-              ctx.fill();
 
               // 흰색 텍스트 그리기
-              ctx.fillStyle = "white"; // 흰색 텍스트 설정
-              ctx.fillText(
-                `최솟값: ${datasetData}`,
-                bar.x - 35,
-                bar.y - rectHeight + 5
-              );
+              ctx.fillStyle = "black"; // 흰색 텍스트 설정
+              ctx.fillText(`최솟값: ${datasetData}`, bar.x - 50, bar.y +20);
             }
           });
         });

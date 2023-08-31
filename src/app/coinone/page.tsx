@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { http } from "../api/http";
 import {
   CandleChartRes,
   ChartData,
-  CoinListData,
   coinListRes_Coinone,
 } from "@/types/apiTypes";
 import {

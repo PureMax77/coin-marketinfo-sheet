@@ -2,31 +2,30 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { http } from "../api/http";
-import { ChartData_Mexc, coinListRes_Mexc } from "@/types/apiTypes";
+import { ChartData_Upbit, coinListRes_Upbit } from "@/types/apiTypes";
 import {
   CsvInfoType,
-  MexcCurrencyTypes,
-  IntervalTypes,
-  MexcCoinMapType,
+  UpbitCoinMapType,
+  UpbitCurrencyTypes,
 } from "@/types/commonTypes";
 import LoadingScreen from "@/components/Loading";
 import CsvDownButton from "@/components/Button/CsvDownButton";
 import FetchButton from "@/components/Button/FetchButton";
 import CommonSelect from "@/components/Select/CommonSelect";
 import LabelNumInput from "@/components/Input/LabelNumInput";
-import { coinListFilter } from "@/utils/mexcUtils";
+import { coinListFilter } from "@/utils/upbitUtils";
 import CoinChart from "@/components/Chart/CoinChart";
+import moment from "moment";
 
-const DefaultToken = "MEGA";
+const DefaultToken = "META";
 
-export default function MEXC() {
-  const [chartData, setChartData] = useState<ChartData_Mexc[]>([]); // 데이터를 저장할 상태
-  const [currency, setCurrency] = useState<MexcCurrencyTypes>(
-    MexcCurrencyTypes.USDT
+export default function Upbit() {
+  const [chartData, setChartData] = useState<ChartData_Upbit[]>([]); // 데이터를 저장할 상태
+  const [currency, setCurrency] = useState<UpbitCurrencyTypes>(
+    UpbitCurrencyTypes.KRW
   ); // 화폐 단위
-  const [coinMapList, setCoinMapList] = useState<MexcCoinMapType>(new Map()); // 코인 종목
+  const [coinMapList, setCoinMapList] = useState<UpbitCoinMapType>(new Map()); // 코인 종목
   const [nowSymbol, setNowSymbol] = useState<string>(DefaultToken);
-  const [Interval, setInterval] = useState<IntervalTypes>(IntervalTypes.T1H);
   const [selectedYear, setSelectedYear] = useState<number>(
     new Date().getFullYear()
   );
@@ -36,17 +35,13 @@ export default function MEXC() {
   const [csvFile, setCsvFile] = useState<string>("");
   const [csvInfo, setCsvInfo] = useState<CsvInfoType>({
     symbol: DefaultToken,
-    market: MexcCurrencyTypes.USDT,
+    market: UpbitCurrencyTypes.KRW,
     year: 2023,
     month: 1,
   });
 
   const CurrencyArray = useMemo(
-    () => Object.values(MexcCurrencyTypes) as string[],
-    []
-  );
-  const IntervalArray = useMemo(
-    () => Object.values(IntervalTypes) as string[],
+    () => Object.values(UpbitCurrencyTypes) as string[],
     []
   );
 
@@ -74,7 +69,7 @@ export default function MEXC() {
     }
   };
   const currencyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newCurrency = event.target.value as MexcCurrencyTypes;
+    const newCurrency = event.target.value as UpbitCurrencyTypes;
     setCurrency(newCurrency);
 
     // 현재 nowSymbol이 바뀐 market(커런시)에 있는지
@@ -91,13 +86,9 @@ export default function MEXC() {
     setNowSymbol(event.target.value);
     clearData();
   };
-  const IntervalChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setInterval(event.target.value as IntervalTypes);
-    clearData();
-  };
 
   const makeCSV = (
-    filteredData: ChartData_Mexc[],
+    filteredData: ChartData_Upbit[],
     market: string,
     symbol: string,
     year: number,
@@ -116,12 +107,12 @@ export default function MEXC() {
 
     // CSV 데이터 생성
     const csvData = filteredData.map((data) => {
-      const date = new Date(data.openTime);
+      const date = new Date(data.candle_date_time_kst);
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
 
-      return `${market},${symbol},${year},${month},${day},${data.close}`;
+      return `${market},${symbol},${year},${month},${day},${data.trade_price}`;
     });
 
     // 최종 CSV 문자열 생성
@@ -139,17 +130,17 @@ export default function MEXC() {
       return;
     }
 
-    // Data Type [Open time, Open, High,	Low, Close, Volume,	Close time, Quote asset volume]
-    let tmpData: any[][] = [];
+    let tmpData: ChartData_Upbit[] = [];
 
-    const startTime = new Date(selectedYear, selectedMonth - 1, 1, 9).getTime(); // 선택한 달의 다음달 첫날을 지정해서 범위를 러프하게 잡음
-    // const endTime = new Date(selectedYear, selectedMonth, 1, 9).getTime(); // 선택한 달의 다음달 첫날을 지정해서 범위를 러프하게 잡음
+    // const startTime = new Date(selectedYear, selectedMonth - 1, 1, 9).getTime(); // 선택한 달의 다음달 첫날을 지정해서 범위를 러프하게 잡음
+    const endTime = new Date(selectedYear, selectedMonth, 1, 9); // 선택한 달의 다음달 첫날을 지정해서 범위를 러프하게 잡음
+    const formattedTime = moment(endTime).format("YYYY-MM-DD HH:mm:ss");
 
     try {
-      const jsonData = await http<any[][]>(
-        `api/mexc/klines?symbol=${
-          nowSymbol + currency
-        }&interval=1d&startTime=${startTime}&limit=1000`
+      const jsonData = await http<ChartData_Upbit[]>(
+        `api/upbit/candles/days?market=${
+          currency + "-" + nowSymbol
+        }&to=${formattedTime}&count=34`
       );
       tmpData = jsonData;
     } catch (error) {
@@ -158,9 +149,7 @@ export default function MEXC() {
 
     // 한국시간 기준 오전12시 (1시간봉 11시 종가) 필터링
     const filteredData = tmpData.filter((data) => {
-      // openTime Date 객체 생성
-      const date = new Date(data[0]);
-
+      const date = new Date(data.candle_date_time_kst);
       // 원하는 조건 체크: 달과 시간
       const isTargetYaer = date.getFullYear() === selectedYear;
       const isTargetMonth = date.getMonth() + 1 === selectedMonth; // getMonth()는 0부터 시작하므로 +1 필요
@@ -174,25 +163,19 @@ export default function MEXC() {
       return;
     }
 
-    // 형식 변경
-    const newData = filteredData.map((item) => {
-      const data: ChartData_Mexc = { openTime: item[0], close: item[4] };
-      return data;
-    });
-
     // 날짜 sort
-    newData.sort((a, b) => a.openTime - b.openTime);
+    filteredData.sort((a, b) => a.timestamp - b.timestamp);
 
     // csvFile 만들기
-    makeCSV(newData, currency, nowSymbol, selectedYear, selectedMonth);
+    makeCSV(filteredData, currency, nowSymbol, selectedYear, selectedMonth);
 
-    setChartData(newData);
+    setChartData(filteredData);
   };
 
   const fetchCoinList = async () => {
     try {
-      const jsonData = await http<coinListRes_Mexc>(`api/mexc/exchangeInfo`);
-      const coinMapData = coinListFilter(jsonData.symbols);
+      const jsonData = await http<coinListRes_Upbit[]>(`api/upbit/market/all`);
+      const coinMapData = coinListFilter(jsonData);
       setCoinMapList(coinMapData);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -239,7 +222,7 @@ export default function MEXC() {
             </div>
             <div className="mt-5">
               <CsvDownButton
-                exchange={"MEXC"}
+                exchange={"Upbit"}
                 csvContent={csvFile}
                 csvInfo={csvInfo}
                 isDisabled={!csvFile}
@@ -253,7 +236,7 @@ export default function MEXC() {
               </div>
               <div className="mb-10 grid lg:grid-cols-7 sm:grid-cols-5 grid-cols-4 gap-4">
                 {chartData.map((entry, index) => {
-                  const date = new Date(entry.openTime);
+                  const date = new Date(entry.candle_date_time_kst);
                   const year = date.getFullYear();
                   const month = date.getMonth() + 1; // 월은 0부터 시작하므로 1을 더해줍니다.
                   const day = date.getDate();
@@ -264,7 +247,7 @@ export default function MEXC() {
                     >
                       <span>{`${year}.${month}.${day}`}</span>
                       <span>
-                        {entry.close} {csvInfo.market}
+                        {entry.trade_price} {csvInfo.market}
                       </span>
                     </div>
                   );

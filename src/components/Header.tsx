@@ -32,16 +32,14 @@ const Header = () => {
           >
             MEXC
           </Link>
-          <button
+          <Link
+            href="/upbit"
             className={`text-white hover:underline ${
               pathname === "/upbit" && "underline"
             }`}
-            onClick={() => {
-              alert("준비중입니다...");
-            }}
           >
             Upbit
-          </button>
+          </Link>
           {/* <Link href="/upbit" className="text-white hover:underline">
             Upbit
           </Link> */}

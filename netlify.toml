@@ -11,3 +11,10 @@
   status = 200
   force = true
   queryString = "retain"
+
+[[redirects]]
+  from = "/api/upbit/*"
+  to = "https://api.upbit.com/v1/:splat"
+  status = 200
+  force = true
+  queryString = "retain"

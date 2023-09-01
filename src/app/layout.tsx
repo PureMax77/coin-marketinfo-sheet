@@ -18,7 +18,7 @@ export default function RootLayout({
   const cookieStore = cookies();
   const darkCookie = cookieStore.get("darkMode");
   const initDark = darkCookie ? darkCookie.value === "true" : false;
-
+  console.log(433, darkCookie, initDark);
   return (
     <html lang="en" className={initDark ? "dark" : ""}>
       <body className="dark:bg-black ">

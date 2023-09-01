@@ -15,14 +15,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   // 서버랜더링에서도 dark mode 적용을 위해 로컬스토리지 대신 cookie 사용
-  const cookieStore = cookies();
-  const darkCookie = cookieStore.get("darkMode");
-  const initDark = darkCookie ? darkCookie.value === "true" : false;
-  console.log(433, darkCookie, initDark);
+  // const cookieStore = cookies();
+  // const darkCookie = cookieStore.get("darkMode");
+  // const initDark = darkCookie ? darkCookie.value === "true" : false;
+  // console.log(433, darkCookie, initDark);
   return (
-    <html lang="en" className={initDark ? "dark" : ""}>
+    // <html lang="en" className={initDark ? "dark" : ""}>
+    <html lang="en">
       <body className="dark:bg-black ">
-        <Header darkCookie={initDark} />
+        <Header darkCookie={true} />
         {children}
       </body>
     </html>

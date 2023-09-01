@@ -4,7 +4,11 @@ import Link from "next/link";
 import DarkModeToggle from "./Button/DarkModeToggle";
 import { usePathname } from "next/navigation";
 
-const Header = () => {
+interface Props {
+  darkCookie: boolean;
+}
+
+const Header: React.FC<Props> = ({ darkCookie }) => {
   const pathname = usePathname();
 
   return (
@@ -15,7 +19,7 @@ const Header = () => {
         </Link>
 
         <nav className="flex space-y-2 md:space-y-0 md:space-x-4 space-x-4 justify-center items-center">
-          <DarkModeToggle />
+          <DarkModeToggle darkCookie={darkCookie} />
           <Link
             href="/coinone"
             className={`text-white hover:underline ${

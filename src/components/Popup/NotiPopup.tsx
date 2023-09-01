@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 
 const NotiPopup: React.FC = () => {
@@ -35,7 +37,7 @@ const NotiPopup: React.FC = () => {
 
           <div className=" max-w-sm bg-white p-6 shadow-lg rounded-lg relative z-50">
             <p className="text-lg mb-4">
-              해외에서 접속 시 값이 틑릴 수 있으니
+              해외에서 접속 시 값이 틀릴 수 있으니
               <br />꼭 확인 후 사용하세요.
             </p>
             <div className="flex justify-center">

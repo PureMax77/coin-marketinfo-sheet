@@ -1,5 +1,3 @@
-"use client";
-
 import NotiPopup from "@/components/Popup/NotiPopup";
 import Link from "next/link";
 

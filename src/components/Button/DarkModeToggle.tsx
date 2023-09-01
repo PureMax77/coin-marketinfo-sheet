@@ -1,24 +1,39 @@
+"use client";
+
 /**
  * @gogleset 다크모드 토글 버튼입니다.
  */
 
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import { serialize } from "cookie";
 
-const DarkModeToggle = () => {
-  const [toggle, setToggle] = useState<boolean>(false);
+interface Props {
+  darkCookie: boolean;
+}
+
+const DarkModeToggle: React.FC<Props> = ({ darkCookie }) => {
+  const [toggle, setToggle] = useState<boolean>(darkCookie);
 
   const onClickHandler = (event: React.MouseEvent) => {
     event.preventDefault();
-    setToggle(!toggle);
+    // toggle 값을 반전시키고 로컬 스토리지에 저장합니다.
+    const newToggle = !toggle;
+    setToggle(newToggle);
+
+    // 쿠키에 다크 모드 상태를 저장합니다.
+    document.cookie = serialize("darkMode", newToggle.toString(), {
+      sameSite: "lax",
+      path: "/",
+    });
   };
 
   useEffect(() => {
-    console.log(toggle);
     toggle
       ? document.querySelector("html")?.classList.add("dark")
       : document.querySelector("html")?.classList.remove("dark");
   }, [toggle]);
+
   return (
     <button
       type="button"

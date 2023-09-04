@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import "./globals.css";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Coin-MarketInfo-Sheet",
@@ -21,9 +22,35 @@ export default function RootLayout({
   const darkClass = initDark ? "dark" : "";
 
   return (
-    <html lang="en" className={darkClass}>
-      <body className="dark:bg-black ">
-        <Header darkCookie={true} />
+    <html lang='en' className={darkClass}>
+      <body className='dark:bg-black '>
+        <Script
+          id='show-banner'
+          dangerouslySetInnerHTML={{
+            __html: `
+            const html = document.getElementsByTagName("html")
+            let cookieName = "darkMode=";
+            let cookieData = document.cookie;
+            let cookieValue = "";
+            let start = cookieData.indexOf(cookieName);
+
+            if (start !== -1) {
+            start += cookieName.length;
+            let end = cookieData.indexOf(";", start);
+            if (end === -1) end = cookieData.length;
+            cookieValue = cookieData.substring(start, end);
+            }
+  
+            let result = unescape(cookieValue);
+            if(result){
+              html.className = "dark"
+            } else {
+              html.className = ""
+            }
+            `,
+          }}
+        />
+        <Header />
         {children}
       </body>
     </html>

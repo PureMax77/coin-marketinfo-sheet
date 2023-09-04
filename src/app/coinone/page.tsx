@@ -215,7 +215,7 @@ export default function Coinone() {
       {symbolList.length === 0 ? (
         <LoadingScreen />
       ) : (
-        <div className="container mx-auto p-4">
+        <div className='container mx-auto p-4'>
           <div>
             <div>
               <FetchButton onClick={fetchData} />
@@ -244,7 +244,7 @@ export default function Coinone() {
                 onChange={handleMonthChange}
               />
             </div>
-            <div className="mt-5">
+            <div className='mt-5'>
               <CsvDownButton
                 exchange={"Coinone"}
                 csvContent={csvFile}
@@ -253,12 +253,13 @@ export default function Coinone() {
               />
             </div>
           </div>
+
           {chartData.length > 0 && (
             <>
-              <div className="my-2 dark:text-white mt-10 font-medium">
+              <div className='my-2 dark:text-white mt-10 font-medium'>
                 종가: 24시 기준
               </div>
-              <div className="mb-10 grid lg:grid-cols-7 sm:grid-cols-5 grid-cols-4 gap-4">
+              <div className='mb-10 grid lg:grid-cols-7 sm:grid-cols-5 grid-cols-4 gap-4'>
                 {chartData.map((entry, index) => {
                   const date = new Date(entry.timestamp);
                   const year = date.getFullYear();
@@ -267,8 +268,7 @@ export default function Coinone() {
                   return (
                     <div
                       key={index}
-                      className="bg-gray-200 p-2 text-center rounded-sm flex flex-col"
-                    >
+                      className='bg-gray-200 p-2 text-center rounded-sm flex flex-col'>
                       <span>{`${year}.${month}.${day}`}</span>
                       <span>
                         {entry.close} {csvInfo.market}
